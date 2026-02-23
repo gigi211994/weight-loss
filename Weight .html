@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>📅 3個月減肥追蹤系統（90日）</title>
+  <style>
+    :root{
+      --bg:#0b1220;
+      --card:#111a2e;
+      --card2:#0f172a;
+      --muted:#94a3b8;
+      --text:#e5e7eb;
+      --text2:#cbd5e1;
+      --primary:#38bdf8;
+      --good:#10b981;
+      --warn:#f59e0b;
+      --bad:#ef4444;
+      --line:#22304f;
+      --shadow:0 10px 30px rgba(0,0,0,.35);
+      --radius:14px;
+      --radius2:10px;
+      --font:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang TC","Microsoft JhengHei",sans-serif;
+    }
+    @media (prefers-color-scheme: light){
+      :root{
+        --bg:#f8fafc;
+        --card:#ffffff;
+        --card2:#f1f5f9;
+        --muted:#64748b;
+        --text:#0f172a;
+        --text2:#334155;
+        --primary:#0284c7;
+        --line:#e2e8f0;
+        --shadow:0 10px 30px rgba(2, 6, 23, .08);
+      }
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.55;padding:18px}
+    .wrap{max-width:920px;margin:0 auto}
+    h1{font-size:26px;letter-spacing:.2px;text-align:center;margin:8px 0 6px;color:var(--primary)}
+    .sub{font-size:13px;text-align:center;color:var(--muted);margin-bottom:16px}
+    .grid{display:grid;grid-template-columns: 1.15fr .85fr;gap:14px}
+    @media (max-width: 860px){ .grid{grid-template-columns:1fr} }
+    .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px}
+    .card h2{font-size:16px;color:var(--text2);margin-bottom:12px}
+    .row{display:flex;gap:10px;flex-wrap:wrap}
+    .kpi{flex:1;min-width:160px;background:var(--card2);border:1px solid var(--line);border-radius:var(--radius2);padding:12px}
+    .kpi .label{font-size:12px;color:var(--muted);margin-bottom:6px}
+    .kpi .value{font-size:20px;font-weight:700}
+    .kpi .hint{font-size:12px;color:var(--muted);margin-top:6px}
+    .barWrap{margin-top:12px;background:var(--card2);border:1px solid var(--line);border-radius:999px;overflow:hidden;height:16px}
+    .bar{height:100%;width:0%;background:linear-gradient(90deg, var(--primary), var(--good));transition:width .4s ease}
+    .barText{font-size:12px;color:var(--muted);margin-top:8px;text-align:center}
+    .form{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+    @media (max-width: 560px){ .form{grid-template-columns:1fr} }
+    .field{display:flex;flex-direction:column;gap:6px}
+    .field label{font-size:12px;color:var(--muted)}
+    input, textarea, select{
+      background:var(--card2);border:1px solid var(--line);border-radius:10px;
+      color:var(--text);padding:10px 10px;font-size:14px;outline:none
+    }
+    textarea{min-height:86px;resize:vertical}
+    .btnRow{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+    button{
+      border:none;border-radius:12px;padding:11px 14px;font-weight:700;
+      cursor:pointer;box-shadow:0 8px 18px rgba(0,0,0,.18)
+    }
+    .btnPrimary{background:var(--primary);color:var(--text)}
+    .btnGhost{background:transparent;color:var(--text2);border:1px solid var(--line);box-shadow:none}
+    .btnDanger{background:var(--bad);color:#fff}
+    .list{margin-top:12px;display:flex;flex-direction:column;gap:10px}
+    .item{
+      background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:12px
+    }
+    .itemTop{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+    .itemDate{font-weight:800}
+    .pill{font-size:12px;border:1px solid var(--line);padding:4px 8px;border-radius:999px;color:var(--muted)}
+    .itemMid{margin-top:8px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+    @media (max-width: 640px){ .itemMid{grid-template-columns:1fr} }
+    .mini{background:transparent;border:1px dashed var(--line);border-radius:10px;padding:8px}
+    .mini .mLabel{font-size:12px;color:var(--muted)}
+    .mini .mVal{font-size:14px;font-weight:700;margin-top:4px}
+    .note{margin-top:8px;color:var(--text2);font-size:13px;white-space:pre-wrap}
+    .tips ul{margin:8px 0 0 18px}
+    .tips li{margin:6px 0;color:var(--text2);font-size:13px}
+    .muted{color:var(--muted)}
+    .small{font-size:12px}
+    .sep{height:1px;background:var(--line);margin:12px 0}
+    .warnBox{
+      background:rgba(245,158,11,.12);
+      border:1px solid rgba(245,158,11,.35);
+      padding:12px;border-radius:12px;color:var(--text2)
+    }
+    .goodBox{
+      background:rgba(16,185,129,.12);
+      border:1px solid rgba(16,185,129,.35);
+      padding:12px;border-radius:12px;color:var(--text2)
+    }
+    .mono{font-variant-numeric: tabular-nums}
+    canvas{width:100%;height:220px;background:transparent}
+    .chartCard{padding:14px}
+    .chartTitle{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h1>📅 3個月減肥追蹤系統（90日）</h1>
+  <div class="sub">
+    預設：由 <span class="mono" id="startDateText"></span> 開始 · 目標：90日減 <span class="mono" id="goalLossText"></span> kg · 記錄會儲存在你部手機/電腦（本機瀏覽器）
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h2>✅ 今日打卡</h2>
+
+      <div class="row">
+        <div class="kpi">
+          <div class="label">Day</div>
+          <div class="value mono" id="dayNumber">—</div>
+          <div class="hint" id="dayRangeHint">—</div>
+        </div>
+        <div class="kpi">
+          <div class="label">現時體重（最新）</div>
+          <div class="value mono" id="latestWeight">—</div>
+          <div class="hint muted">kg</div>
+        </div>
+        <div class="kpi">
+          <div class="label">距離目標尚差（估算）</div>
+          <div class="value mono" id="remainingToGoal">—</div>
+          <div class="hint muted">kg（按最新體重計）</div>
+        </div>
+      </div>
+
+      <div class="barWrap" aria-label="progress">
+        <div class="bar" id="progressBar"></div>
+      </div>
+      <div class="barText" id="progressText">未開始</div>
+
+      <div class="sep"></div>
+
+      <div class="form">
+        <div class="field">
+          <label>日期</label>
+          <input type="date" id="entryDate"/>
+        </div>
+
+        <div class="field">
+          <label>體重（kg）</label>
+          <input type="number" id="weight" placeholder="例如 70.5" step="0.1" min="30" max="200"/>
+        </div>
+
+        <div class="field">
+          <label>體脂（%）</label>
+          <input type="number" id="bodyfat" placeholder="例如 32.1（可留空）" step="0.1" min="5" max="80"/>
+        </div>
+
+        <div class="field">
+          <label>運動（預設：跑步 2 / Gyro 1 每週）</label>
+          <select id="workout">
+            <option value="">今日冇做</option>
+            <option value="跑步">跑步</option>
+            <option value="Gyrotonic">Gyrotonic</option>
+            <option value="步行/活動量">步行/活動量</option>
+            <option value="力量/核心">力量/核心</option>
+            <option value="其他">其他</option>
+          </select>
+        </div>
+
+        <div class="field" style="grid-column: 1 / -1;">
+          <label>飲食/狀況備註（IBS-D / PCOS / PMS / Ozempic 相關都可以寫）</label>
+          <textarea id="notes" placeholder="例如：早餐蛋白質足夠？有冇腹瀉/腹痛？今日水腫？食咗咩觸發？"></textarea>
+        </div>
+      </div>
+
+      <div class="btnRow">
+        <button class="btnPrimary" onclick="saveEntry()">💾 儲存今日打卡</button>
+        <button class="btnGhost" onclick="exportJSON()">⬇️ 匯出資料（JSON）</button>
+        <button class="btnGhost" onclick="importJSON()">⬆️ 匯入資料（JSON）</button>
+        <button class="btnDanger" onclick="clearAll()">🧨 清除全部記錄</button>
+      </div>
+
+      <div class="sep"></div>
+
+      <div class="warnBox small">
+        <div><strong>蛋白質提示（簡化版）：</strong>每餐先確保「蛋白質優先」：雞/魚/蛋/豆腐/希臘乳酪；唔好只食淨碳水。</div>
+        <div class="muted" style="margin-top:6px">（IBS-D／PCOS／用緊 Ozempic：太油、太辣、酒精、過量奶類、洋蔥蒜等可能會令腸胃唔舒服，自己用備註記觸發點。）</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>📌 計劃 &amp; 提醒</h2>
+
+      <div class="goodBox tips">
+        <div><strong>90日主目標：</strong>穩定減脂、保肌肉、可持續。</div>
+        <ul>
+          <li>每週 2 次跑步（易跑/節奏跑/間歇輪替都得），1 次 Gyrotonic。</li>
+          <li>每日至少一餐「高蛋白 + 蔬菜」，盡量避免空肚只食甜/精緻澱粉。</li>
+          <li>體重一兩日上落好正常：留意 7日平均趨勢。</li>
+        </ul>
+      </div>
+
+      <div class="sep"></div>
+
+      <div class="tips">
+        <div><strong>打卡黃金規則：</strong></div>
+        <ul>
+          <li>最好每日同一時間量（例如起身去廁所後）。</li>
+          <li>IBS-D / PMS 發作日，記低食咗乜、壓力、睡眠、腸胃反應。</li>
+          <li>如果 7–10 日都冇趨勢下降：先檢查「蛋白質不足/零食/飲品熱量/活動量」。</li>
+        </ul>
+      </div>
+
+      <div class="sep"></div>
+
+      <div class="chartCard">
+        <div class="chartTitle">
+          <div><strong>📈 體重趨勢</strong> <span class="muted small">（最近 30 筆）</span></div>
+          <div class="pill" id="chartHint">—</div>
+        </div>
+        <canvas id="chart" width="600" height="260"></canvas>
+        <div class="muted small" style="margin-top:8px">如果圖表唔顯示：通常係未輸入任何體重，先打卡一次就會出。</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:14px">
+    <h2>📚 近期記錄</h2>
+    <div class="muted small">提示：點「清除全部」前，建議先匯出 JSON 留底。</div>
+    <div class="list" id="list"></div>
+    <div class="muted" id="empty" style="padding:18px;text-align:center;display:none">暫時未有記錄。由今日開始打卡啦。</div>
+  </div>
+</div>
+
+<script>
+  const CONFIG = {
+    startDate: "2026-02-23",
+    durationDays: 90,
+    goalLossKg: 6.0
+  };
+
+  const STORAGE_KEY = "fatloss90_v1_entries";
+
+  function $(id){ return document.getElementById(id); }
+
+  function toISO(d){
+    const z = n => String(n).padStart(2,"0");
+    return `${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())}`;
+  }
+
+  function parseISO(s){
+    const [y,m,d]=s.split("-").map(Number);
+    return new Date(y, m-1, d);
+  }
+
+  function clamp(n,min,max){ return Math.max(min, Math.min(max, n)); }
+
+  function loadEntries(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : [];
+    }catch(e){
+      return [];
+    }
+  }
+
+  function saveEntries(arr){
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+  }
+
+  function sortEntries(arr){
+    return arr.slice().sort((a,b)=> (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
+  }
+
+  function getDayNumber(dateISO){
+    const start = parseISO(CONFIG.startDate);
+    const d = parseISO(dateISO);
+    const diff = Math.floor((d - start) / (1000*60*60*24)) + 1;
+    return diff;
+  }
+
+  function formatKg(x){
+    if (x === null || x === undefined || x === "") return "—";
+    const n = Number(x);
+    if (Number.isNaN(n)) return "—";
+    return n.toFixed(1);
+  }
+
+  function setDefaultsUI(){
+    $("startDateText").textContent = CONFIG.startDate;
+    $("goalLossText").textContent = CONFIG.goalLossKg.toFixed(1);
+    $("entryDate").value = toISO(new Date());
+    $("dayRangeHint").textContent = `Day 1 至 Day ${CONFIG.durationDays}`;
+  }
+
+  function saveEntry(){
+    const date = $("entryDate").value;
+    const w = $("weight").value;
+    const bf = $("bodyfat").value;
+    const workout = $("workout").value;
+    const notes = $("notes").value || "";
+
+    if(!date){ alert("請選日期"); return; }
+    if(!w){ alert("請輸入體重（kg）"); return; }
+
+    const weight = Number(w);
+    if(Number.isNaN(weight) || weight <= 0){ alert("體重格式唔正確"); return; }
+
+    const bodyfat = bf ? Number(bf) : null;
+    if(bf && (Number.isNaN(bodyfat) || bodyfat <= 0 || bodyfat > 80)){
+      alert("體脂格式唔正確（或留空）");
+      return;
+    }
+
+    const day = getDayNumber(date);
+    if(day < 1 || day > CONFIG.durationDays){
+      const ok = confirm(`你揀嘅日期係計劃範圍外（Day ${day}）。都要照樣儲存？`);
+      if(!ok) return;
+    }
+
+    const entries = loadEntries();
+    const filtered = entries.filter(x => x.date !== date);
+    filtered.push({ date, weight, bodyfat, workout, notes, updatedAt: new Date().toISOString() });
+    const sorted = sortEntries(filtered);
+    saveEntries(sorted);
+
+    $("weight").value = "";
+    $("bodyfat").value = "";
+    $("workout").value = "";
+    $("notes").value = "";
+
+    renderAll();
+    alert("已儲存 ✅");
+  }
+
+  function deleteEntry(date){
+    const ok = confirm(`刪除 ${date} 呢條記錄？`);
+    if(!ok) return;
+    const entries = loadEntries().filter(x => x.date !== date);
+    saveEntries(entries);
+    renderAll();
+  }
+
+  function clearAll(){
+    const ok = confirm("真係要清除全部記錄？（不可還原）");
+    if(!ok) return;
+    localStorage.removeItem(STORAGE_KEY);
+    renderAll();
+  }
+
+  function exportJSON(){
+    const entries = loadEntries();
+    const payload = {
+      meta: {
+        exportedAt: new Date().toISOString(),
+        config: CONFIG,
+        version: 1
+      },
+      entries
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], {type:"application/json"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `fatloss90_export_${toISO(new Date())}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  function importJSON(){
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "application/json";
+    input.onchange = () => {
+      const file = input.files && input.files[0];
+      if(!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try{
+          const data = JSON.parse(reader.result);
+          if(!data || !Array.isArray(data.entries)) throw new Error("format");
+          const cleaned = data.entries
+            .filter(x => x && x.date && x.weight)
+            .map(x => ({
+              date: x.date,
+              weight: Number(x.weight),
+              bodyfat: (x.bodyfat === null || x.bodyfat === undefined || x.bodyfat === "") ? null : Number(x.bodyfat),
+              workout: x.workout || "",
+              notes: x.notes || "",
+              updatedAt: x.updatedAt || new Date().toISOString()
+            }))
+            .filter(x => !Number.isNaN(x.weight) && x.weight > 0);
+
+          const merged = sortEntries(cleaned);
+          saveEntries(merged);
+          renderAll();
+          alert("匯入完成 ✅");
+        }catch(e){
+          alert("匯入失敗：JSON 格式唔正確");
+        }
+      };
+      reader.readAsText(file);
+    };
+    input.click();
+  }
+
+  function computeStats(entries){
+    const sorted = sortEntries(entries);
+    const latest = sorted.length ? sorted[sorted.length - 1] : null;
+    const first = sorted.length ? sorted[0] : null;
+
+    const latestW = latest ? latest.weight : null;
+    const startW = first ? first.weight : null;
+
+    const targetW = (startW !== null && startW !== undefined) ? (startW - CONFIG.goalLossKg) : null;
+    const remaining = (latestW !== null && targetW !== null) ? (latestW - targetW) : null;
+
+    let progress = 0;
+    if(startW !== null && latestW !== null){
+      const lost = startW - latestW;
+      progress = clamp((lost / CONFIG.goalLossKg) * 100, 0, 120);
+    }
+
+    return { latest, first, latestW, startW, targetW, remaining, progress };
+  }
+
+  function renderKPI(){
+    const entries = loadEntries();
+    const { latestW, remaining, progress } = computeStats(entries);
+
+    const todayISO = toISO(new Date());
+    const d = getDayNumber(todayISO);
+    $("dayNumber").textContent = `Day ${d}`;
+
+    $("latestWeight").textContent = latestW !== null ? formatKg(latestW) : "—";
+
+    if(remaining === null || Number.isNaN(remaining)){
+      $("remainingToGoal").textContent = "—";
+    }else{
+      const r = Math.max(0, remaining);
+      $("remainingToGoal").textContent = r.toFixed(1);
+    }
+
+    $("progressBar").style.width = `${clamp(progress,0,100)}%`;
+
+    if(entries.length === 0){
+      $("progressText").textContent = "未開始：先輸入第一日體重";
+    }else{
+      $("progressText").textContent = `目標完成度：${Math.round(clamp(progress,0,100))}%（以第一筆體重作起點）`;
+    }
+  }
+
+  function renderList(){
+    const entries = loadEntries();
+    const list = $("list");
+    list.innerHTML = "";
+    $("empty").style.display = entries.length ? "none" : "block";
+
+    const show = entries.slice().reverse().slice(0, 30);
+
+    show.forEach(e=>{
+      const day = getDayNumber(e.date);
+      const pill = (day >=1 && day <= CONFIG.durationDays) ? `Day ${day}` : `Day ${day}（範圍外）`;
+
+      const div = document.createElement("div");
+      div.className = "item";
+      div.innerHTML = `
+        <div class="itemTop">
+          <div class="itemDate mono">${e.date}</div>
+          <div class="pill">${pill}</div>
+        </div>
+        <div class="itemMid">
+          <div class="mini">
+            <div class="mLabel">體重</div>
+            <div class="mVal mono">${formatKg(e.weight)} kg</div>
+          </div>
+          <div class="mini">
+            <div class="mLabel">體脂</div>
+            <div class="mVal mono">${e.bodyfat === null || e.bodyfat === undefined ? "—" : e.bodyfat.toFixed(1) + " %"}</div>
+          </div>
+          <div class="mini">
+            <div class="mLabel">運動</div>
+            <div class="mVal">${e.workout ? e.workout : "—"}</div>
+          </div>
+        </div>
+        <div class="note">${e.notes ? e.notes : "<span class='muted'>（冇備註）</span>"}</div>
+        <div class="btnRow" style="margin-top:10px">
+          <button class="btnGhost" style="padding:9px 12px" onclick="prefill('${e.date}')">✏️ 編輯呢日</button>
+          <button class="btnDanger" style="padding:9px 12px" onclick="deleteEntry('${e.date}')">🗑️ 刪除</button>
+        </div>
+      `;
+      list.appendChild(div);
+    });
+  }
+
+  function prefill(date){
+    const entries = loadEntries();
+    const e = entries.find(x => x.date === date);
+    if(!e) return;
+    $("entryDate").value = e.date;
+    $("weight").value = e.weight;
+    $("bodyfat").value = (e.bodyfat === null || e.bodyfat === undefined) ? "" : e.bodyfat;
+    $("workout").value = e.workout || "";
+    $("notes").value = e.notes || "";
+    window.scrollTo({top:0, behavior:"smooth"});
+  }
+
+  function drawChart(){
+    const canvas = $("chart");
+    const ctx = canvas.getContext("2d");
+    const entries = loadEntries();
+    const last = entries.slice(-30);
+
+    const dpr = window.devicePixelRatio || 1;
+    const cssW = canvas.clientWidth || 600;
+    const cssH = 260;
+    canvas.style.height = cssH + "px";
+    canvas.width = Math.floor(cssW * dpr);
+    canvas.height = Math.floor(cssH * dpr);
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+
+    ctx.clearRect(0,0,cssW,cssH);
+
+    if(last.length < 2){
+      $("chartHint").textContent = "需要至少 2 筆體重";
+      ctx.strokeStyle = "rgba(148,163,184,.35)";
+      ctx.setLineDash([6,6]);
+      ctx.strokeRect(10, 10, cssW-20, cssH-20);
+      ctx.setLineDash([]);
+      ctx.fillStyle = "rgba(148,163,184,.75)";
+      ctx.font = "14px " + getComputedStyle(document.body).fontFamily;
+      ctx.fillText("輸入至少兩日體重，就會出趨勢線。", 22, 38);
+      return;
+    }
+
+    const weights = last.map(x => x.weight);
+    const minW = Math.min(...weights);
+    const maxW = Math.max(...weights);
+    const pad = 0.6;
+    const lo = minW - pad;
+    const hi = maxW + pad;
+
+    const left = 36, right = 10, top = 12, bottom = 26;
+    const w = cssW - left - right;
+    const h = cssH - top - bottom;
+
+    ctx.strokeStyle = "rgba(148,163,184,.18)";
+    ctx.lineWidth = 1;
+    for(let i=0;i<=4;i++){
+      const y = top + (h * i/4);
+      ctx.beginPath();
+      ctx.moveTo(left, y);
+      ctx.lineTo(left + w, y);
+      ctx.stroke();
+    }
+
+    ctx.fillStyle = "rgba(148,163,184,.8)";
+    ctx.font = "12px " + getComputedStyle(document.body).fontFamily;
+    for(let i=0;i<=4;i++){
+      const val = (hi - (hi-lo)*i/4);
+      const y = top + (h * i/4);
+      ctx.fillText(val.toFixed(1), 6, y+4);
+    }
+
+    const xFor = (i)=> left + (w * (i/(last.length-1)));
+    const yFor = (wt)=> top + (h * (1 - ((wt-lo)/(hi-lo))));
+
+    ctx.strokeStyle = "rgba(56,189,248,.95)";
+    ctx.lineWidth = 2.2;
+    ctx.beginPath();
+    last.forEach((e,i)=>{
+      const x = xFor(i);
+      const y = yFor(e.weight);
+      if(i===0) ctx.moveTo(x,y);
+      else ctx.lineTo(x,y);
+    });
+    ctx.stroke();
+
+    ctx.fillStyle = "rgba(16,185,129,.95)";
+    last.forEach((e,i)=>{
+      const x = xFor(i);
+      const y = yFor(e.weight);
+      ctx.beginPath();
+      ctx.arc(x,y,3.2,0,Math.PI*2);
+      ctx.fill();
+    });
+
+    const delta = last[last.length-1].weight - last[0].weight;
+    const sign = delta <= 0 ? "↓" : "↑";
+    $("chartHint").textContent = `最近 ${last.length} 筆：${sign} ${Math.abs(delta).toFixed(1)} kg`;
+  }
+
+  function renderAll(){
+    renderKPI();
+    renderList();
+    drawChart();
+  }
+
+  setDefaultsUI();
+  renderAll();
+  window.addEventListener("resize", () => drawChart());
+</script>
+</body>
+</html>
